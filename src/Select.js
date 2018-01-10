@@ -794,6 +794,7 @@ class Select extends React.Component {
 		if (this.props.multi) {
 			return (
 				<Fragment>
+					placeholder
 					{this.props.alwaysShowPlaceholder && placeholder}
 					{valueArray.map((value, i) => {
 						return (
@@ -817,6 +818,7 @@ class Select extends React.Component {
 			if (isOpen) onClick = null;
 			return (
 				<Fragment>
+					placeholder
 					{this.props.alwaysShowPlaceholder && placeholder}
 					<ValueComponent
 						id={this._instancePrefix + '-value-item'}
