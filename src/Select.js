@@ -3,7 +3,7 @@
 	Licensed under the MIT License (MIT), see
 	http://jedwatson.github.io/react-select
 */
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 import AutosizeInput from 'react-input-autosize';
@@ -786,39 +786,48 @@ class Select extends React.Component {
 	renderValue (valueArray, isOpen) {
 		let renderLabel = this.props.valueRenderer || this.getOptionLabel;
 		let ValueComponent = this.props.valueComponent;
-		if (!valueArray.length) {
-			return !this.state.inputValue ? <div className="Select-placeholder">{this.props.placeholder}</div> : null;
+		let placeholder = <div className="Select-placeholder">{this.props.placeholder}</div>;
+		if (!valueArray.length && !this.props.alwaysShowPlaceholder) {
+			return !this.state.inputValue ? placeholder : null;
 		}
 		let onClick = this.props.onValueClick ? this.handleValueClick : null;
 		if (this.props.multi) {
-			return valueArray.map((value, i) => {
-				return (
-					<ValueComponent
-						id={this._instancePrefix + '-value-' + i}
-						instancePrefix={this._instancePrefix}
-						disabled={this.props.disabled || value.clearableValue === false}
-						key={`value-${i}-${value[this.props.valueKey]}`}
-						onClick={onClick}
-						onRemove={this.removeValue}
-						value={value}
-					>
-						{renderLabel(value, i)}
-						<span className="Select-aria-only">&nbsp;</span>
-					</ValueComponent>
-				);
-			});
+			return (
+				<Fragment>
+					{this.props.alwaysShowPlaceholder && placeholder}
+					{valueArray.map((value, i) => {
+						return (
+							<ValueComponent
+								id={this._instancePrefix + '-value-' + i}
+								instancePrefix={this._instancePrefix}
+								disabled={this.props.disabled || value.clearableValue === false}
+								key={`value-${i}-${value[this.props.valueKey]}`}
+								onClick={onClick}
+								onRemove={this.removeValue}
+								value={value}
+							>
+								{renderLabel(value, i)}
+								<span className="Select-aria-only">&nbsp;</span>
+							</ValueComponent>
+						);
+					})}
+				</Fragment>
+			);
 		} else if (!this.state.inputValue) {
 			if (isOpen) onClick = null;
 			return (
-				<ValueComponent
-					id={this._instancePrefix + '-value-item'}
-					disabled={this.props.disabled}
-					instancePrefix={this._instancePrefix}
-					onClick={onClick}
-					value={valueArray[0]}
-				>
-					{renderLabel(valueArray[0])}
-				</ValueComponent>
+				<Fragment>
+					{this.props.alwaysShowPlaceholder && placeholder}
+					<ValueComponent
+						id={this._instancePrefix + '-value-item'}
+						disabled={this.props.disabled}
+						instancePrefix={this._instancePrefix}
+						onClick={onClick}
+						value={valueArray[0]}
+					>
+						{renderLabel(valueArray[0])}
+					</ValueComponent>
+				</Fragment>
 			);
 		}
 	}
@@ -1210,6 +1219,7 @@ class Select extends React.Component {
 };
 
 Select.propTypes = {
+	alwaysShowPlaceholder: PropTypes.bool, // whether the placeholder element is always visible
 	'aria-describedby': PropTypes.string, // HTML ID(s) of element(s) that should be used to describe this input (for assistive tech)
 	'aria-label': PropTypes.string,       // Aria label (for assistive tech)
 	'aria-labelledby': PropTypes.string,  // HTML ID of an element that should be used as the label (for assistive tech)
@@ -1293,6 +1303,7 @@ Select.propTypes = {
 };
 
 Select.defaultProps = {
+	alwaysShowPlaceholder: false,
 	arrowRenderer: defaultArrowRenderer,
 	autosize: true,
 	backspaceRemoves: true,
