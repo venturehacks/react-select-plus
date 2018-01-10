@@ -1604,47 +1604,60 @@ var Select$1 = function (_React$Component) {
 
 			var renderLabel = this.props.valueRenderer || this.getOptionLabel;
 			var ValueComponent = this.props.valueComponent;
-			if (!valueArray.length) {
-				return !this.state.inputValue ? React__default.createElement(
-					'div',
-					{ className: 'Select-placeholder' },
-					this.props.placeholder
-				) : null;
+			var placeholder = React__default.createElement(
+				'div',
+				{ className: 'Select-placeholder' },
+				this.props.placeholder
+			);
+			if (!valueArray.length && !this.props.alwaysShowPlaceholder) {
+				return !this.state.inputValue ? placeholder : null;
 			}
 			var onClick = this.props.onValueClick ? this.handleValueClick : null;
 			if (this.props.multi) {
-				return valueArray.map(function (value, i) {
-					return React__default.createElement(
-						ValueComponent,
-						{
-							id: _this6._instancePrefix + '-value-' + i,
-							instancePrefix: _this6._instancePrefix,
-							disabled: _this6.props.disabled || value.clearableValue === false,
-							key: 'value-' + i + '-' + value[_this6.props.valueKey],
-							onClick: onClick,
-							onRemove: _this6.removeValue,
-							value: value
-						},
-						renderLabel(value, i),
-						React__default.createElement(
-							'span',
-							{ className: 'Select-aria-only' },
-							'\xA0'
-						)
-					);
-				});
+				return React__default.createElement(
+					React.Fragment,
+					null,
+					'placeholder',
+					this.props.alwaysShowPlaceholder && placeholder,
+					valueArray.map(function (value, i) {
+						return React__default.createElement(
+							ValueComponent,
+							{
+								id: _this6._instancePrefix + '-value-' + i,
+								instancePrefix: _this6._instancePrefix,
+								disabled: _this6.props.disabled || value.clearableValue === false,
+								key: 'value-' + i + '-' + value[_this6.props.valueKey],
+								onClick: onClick,
+								onRemove: _this6.removeValue,
+								value: value
+							},
+							renderLabel(value, i),
+							React__default.createElement(
+								'span',
+								{ className: 'Select-aria-only' },
+								'\xA0'
+							)
+						);
+					})
+				);
 			} else if (!this.state.inputValue) {
 				if (isOpen) onClick = null;
 				return React__default.createElement(
-					ValueComponent,
-					{
-						id: this._instancePrefix + '-value-item',
-						disabled: this.props.disabled,
-						instancePrefix: this._instancePrefix,
-						onClick: onClick,
-						value: valueArray[0]
-					},
-					renderLabel(valueArray[0])
+					React.Fragment,
+					null,
+					'placeholder',
+					this.props.alwaysShowPlaceholder && placeholder,
+					React__default.createElement(
+						ValueComponent,
+						{
+							id: this._instancePrefix + '-value-item',
+							disabled: this.props.disabled,
+							instancePrefix: this._instancePrefix,
+							onClick: onClick,
+							value: valueArray[0]
+						},
+						renderLabel(valueArray[0])
+					)
 				);
 			}
 		}
@@ -2057,6 +2070,7 @@ var Select$1 = function (_React$Component) {
 
 
 Select$1.propTypes = {
+	alwaysShowPlaceholder: PropTypes.bool, // whether the placeholder element is always visible
 	'aria-describedby': PropTypes.string, // HTML ID(s) of element(s) that should be used to describe this input (for assistive tech)
 	'aria-label': PropTypes.string, // Aria label (for assistive tech)
 	'aria-labelledby': PropTypes.string, // HTML ID of an element that should be used as the label (for assistive tech)
@@ -2140,6 +2154,7 @@ Select$1.propTypes = {
 };
 
 Select$1.defaultProps = {
+	alwaysShowPlaceholder: false,
 	arrowRenderer: arrowRenderer,
 	autosize: true,
 	backspaceRemoves: true,
